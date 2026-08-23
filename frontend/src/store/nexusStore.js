@@ -3,7 +3,7 @@ import { safeLocalStorage, safeSessionStorage } from '../utils/safeStorage';
 
 const API_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001/api'
-  : (import.meta.env.VITE_API_URL || 'https://nexusaibackend-production.up.railway.app/api');
+  : (import.meta.env.VITE_API_URL || 'https://nexus-ai-production-72d2.up.railway.app/api');
 
 const getAuthHeaders = () => {
   const token = safeSessionStorage.getItem('token') || safeLocalStorage.getItem('token');

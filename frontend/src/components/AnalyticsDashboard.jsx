@@ -19,7 +19,7 @@ const API_URL =
   window.location.hostname === 'localhost'
     ? 'http://localhost:5001/api'
     : import.meta.env.VITE_API_URL ||
-      'https://nexusaibackend-production.up.railway.app/api';
+      'https://nexus-ai-production-72d2.up.railway.app/api';
 
 const COLORS = [
   '#6366f1',
