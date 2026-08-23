@@ -50,9 +50,9 @@ export default function Footer() {
               <div className="space-y-3">
                 <div className="text-white font-medium uppercase tracking-wider text-[10px]">Architecture</div>
                 <ul className="space-y-2 text-[11px] sm:text-xs font-sans text-purple-100">
-                  <li><a href="#benchmarks" className="hover:text-white transition-colors block">Core Nodes</a></li>
-                  <li><a href="#benchmarks" className="hover:text-white transition-colors block">Sub-14ms Benchmarks</a></li>
-                  <li><a href="#telemetry" className="hover:text-white transition-colors block">Telemetry Engine</a></li>
+                  <li><a href="#benchmarks" className="hover:text-white transition-colors block py-1.5">Core Nodes</a></li>
+                  <li><a href="#benchmarks" className="hover:text-white transition-colors block py-1.5">Sub-14ms Benchmarks</a></li>
+                  <li><a href="#telemetry" className="hover:text-white transition-colors block py-1.5">Telemetry Engine</a></li>
                 </ul>
               </div>
 

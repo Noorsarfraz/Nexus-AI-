@@ -41,7 +41,7 @@ export default function Contact() {
         <div className="lg:col-span-6 bg-[#070b19]/95 border border-slate-700 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden w-full">
           <div className="text-xs font-mono text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-700 pb-4 flex justify-between items-center">
             <span>Secure Mailbox Protocol</span>
-            <span className="text-[10px] bg-slate-800 px-2.5 py-1 rounded text-brand-primary font-bold">TLS 1.3</span>
+            <span className="text-[10px] bg-brand-primary px-2.5 py-1 rounded text-white font-bold">TLS 1.3</span>
           </div>
 
           {formSubmitted ? (

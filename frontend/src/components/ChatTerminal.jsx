@@ -97,7 +97,7 @@ export default function ChatTerminal({ messages, setMessages, isTyping, setIsTyp
         />
         <button 
           type="submit" 
-          className="bg-brand-primary hover:bg-brand-primary/90 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-95 cursor-pointer shadow-md shadow-brand-primary/20"
+          className="bg-[#5457e0] hover:bg-brand-primary/90 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-95 cursor-pointer shadow-md shadow-brand-primary/20"
         >
           Send Node
         </button>

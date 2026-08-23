@@ -4,6 +4,7 @@ import { Server, X } from 'lucide-react';
 import Button from './Button';
 import Metrics from './Metrics';
 import heroIllustration from '../assets/hero-illustration.png';
+import heroIllustrationWebp from '../assets/hero-illustration.webp';
 
 export default function Hero({ analyticsData }) {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export default function Hero({ analyticsData }) {
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-brand-primary"></span>
             </span>
             <span className="bg-gradient-to-r from-slate-100 to-slate-400 bg-clip-text text-transparent truncate">Nexus Terminal</span>
-            <span className="text-[9px] bg-brand-primary/20 text-brand-primary px-1 rounded font-mono">v4.2</span>
+            <span className="text-[9px] bg-brand-primary text-white px-1 rounded font-mono">v4.2</span>
           </div>
           
           {/* Scalable Heading for Mobile and Laptop */}
@@ -67,11 +68,16 @@ export default function Hero({ analyticsData }) {
           <div className="absolute inset-0 bg-[#030712]/40 rounded-3xl blur-2xl pointer-events-none"></div>
 
           <div className="relative w-full overflow-hidden p-0 bg-transparent">
-            <img 
-              src={heroIllustration} 
-              alt="Nexus AI Architecture Network" 
-              className="w-full h-auto object-contain opacity-95 hover:opacity-100 transition-opacity duration-500 [mask-image:radial-gradient(circle_at_center,black_50%,transparent_90%)] filter blur-[0.3px] saturate-125"
-            />
+            <picture>
+              <source srcSet={heroIllustrationWebp} type="image/webp" />
+              <img 
+                src={heroIllustration} 
+                alt="Nexus AI Architecture Network" 
+                width="700"
+                height="341"
+                className="w-full h-auto object-contain opacity-95 hover:opacity-100 transition-opacity duration-500 [mask-image:radial-gradient(circle_at_center,black_50%,transparent_90%)] filter blur-[0.3px] saturate-125"
+              />
+            </picture>
           </div>
         </div>
 
