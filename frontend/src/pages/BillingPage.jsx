@@ -1,0 +1,338 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import useDocumentTitle from '../utils/useDocumentTitle';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
+export default function BillingPage() {
+  useDocumentTitle('Billing');
+  const [currentPlan, setCurrentPlan] = useState('Developer');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [showActiveModal, setShowActiveModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  // Payment Modal States
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState('jazzcash');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const savedPlan = localStorage.getItem('nexus_user_plan');
+    if (savedPlan) {
+      setCurrentPlan(savedPlan);
+    }
+  }, []);
+
+  const handlePaymentSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // Simulating API request with API_URL readiness
+    setTimeout(() => {
+      setLoading(false);
+      setShowPayModal(false);
+      setCurrentPlan('Enterprise');
+      localStorage.setItem('nexus_user_plan', 'Enterprise');
+      setSuccessMsg('Successfully upgraded to Enterprise Tier via ' + selectedMethod.toUpperCase() + '!');
+      setAccountNumber('');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    }, 1500);
+  };
+
+  const handleDowngrade = (planName) => {
+    setCurrentPlan(planName);
+    localStorage.setItem('nexus_user_plan', planName);
+    setSuccessMsg(`Switched back to ${planName} Tier.`);
+    setTimeout(() => setSuccessMsg(''), 3000);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex">
+      
+      {/* Sidebar */}
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900/90 border-r border-slate-800 transition-all duration-300 flex flex-col justify-between p-4 sticky top-0 h-screen z-20 backdrop-blur-xl card-container`}>
+        <div className="space-y-8">
+          {/* Brand Logo */}
+          <div className="flex items-center justify-between px-2">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-600/30">
+                N
+              </div>
+              {sidebarOpen && <span className="text-xl font-black text-white title-text tracking-wide">NexusAI</span>}
+            </Link>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="space-y-1.5">
+            {[
+              { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+              { path: '/analytics', label: 'Analytics & Reports', icon: '📈' },
+              { path: '/models', label: 'AI Models Hub', icon: '🤖' },
+              { path: '/api-keys', label: 'API Keys & Tokens', icon: '🔑' },
+              { path: '/profile', label: 'Profile', icon: '👤' },
+              { path: '/settings', label: 'Settings', icon: '⚙️' },
+              { path: '/billing', label: 'Billing', icon: '💳' },
+            ].map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all ${
+                    isActive
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                      : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
+                  }`}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  {sidebarOpen && <span className="text-sm">{item.label}</span>}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Sidebar Footer / Toggle */}
+        <div className="space-y-3 pt-4 border-t border-slate-800/60">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="w-full py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white text-xs rounded-xl transition cursor-pointer border border-slate-700/50"
+          >
+            {sidebarOpen ? '◀ Collapse' : '▶'}
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-6 md:p-10 relative overflow-y-auto">
+        <div className="max-w-4xl mx-auto space-y-8">
+          
+          {/* Top Header */}
+          <div className="flex justify-between items-center bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Billing & Subscriptions</h1>
+              <p className="text-sm text-slate-400">Manage your active tier, regional payments, and server resource allocation.</p>
+            </div>
+            <Link 
+              to="/dashboard" 
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm rounded-xl transition border border-slate-700"
+            >
+              <span>←</span> Back to Dashboard
+            </Link>
+          </div>
+
+          {successMsg && (
+            <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm rounded-xl flex items-center gap-2 shadow-lg">
+              <span>✓</span> {successMsg}
+            </div>
+          )}
+
+          {/* Plans Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Developer Tier */}
+            <div className={`bg-slate-900 p-8 rounded-2xl space-y-4 relative shadow-xl transition border ${currentPlan === 'Developer' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
+              {currentPlan === 'Developer' && (
+                <span className="absolute top-6 right-6 px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded-full font-mono">
+                  CURRENT PLAN
+                </span>
+              )}
+              <h2 className="text-xl font-bold text-white">Developer Tier</h2>
+              <p className="text-3xl font-black text-white">$0 <span className="text-xs font-normal text-slate-400">/ month</span></p>
+              <p className="text-sm text-slate-400">Includes standard API endpoints, up to 5 live server nodes, and basic JWT security.</p>
+              
+              {currentPlan === 'Developer' ? (
+                <button 
+                  onClick={() => setShowActiveModal(true)}
+                  className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-indigo-400 font-medium rounded-xl text-sm transition cursor-pointer border border-indigo-500/30 shadow-md"
+                >
+                  View Active Plan Details
+                </button>
+              ) : (
+                <button 
+                  onClick={() => handleDowngrade('Developer')} 
+                  className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl text-sm transition cursor-pointer border border-slate-700"
+                >
+                  Downgrade to Free
+                </button>
+              )}
+            </div>
+
+            {/* Enterprise Tier */}
+            <div className={`bg-slate-900 p-8 rounded-2xl space-y-4 relative shadow-xl transition border ${currentPlan === 'Enterprise' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
+              {currentPlan === 'Enterprise' && (
+                <span className="absolute top-6 right-6 px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded-full font-mono">
+                  CURRENT PLAN
+                </span>
+              )}
+              <h2 className="text-xl font-bold text-white">Enterprise Tier</h2>
+              <p className="text-3xl font-black text-white">$49 <span className="text-xs font-normal text-slate-400">/ month</span></p>
+              <p className="text-sm text-slate-400">Unlimited AI cluster nodes, dedicated telemetry streams, and priority support.</p>
+              
+              {currentPlan === 'Enterprise' ? (
+                <button 
+                  onClick={() => setShowActiveModal(true)}
+                  className="w-full py-2.5 bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-300 font-medium rounded-xl text-sm transition cursor-pointer border border-indigo-500/40 shadow-md"
+                >
+                  View Active Plan Details
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setShowPayModal(true)} 
+                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl text-sm transition cursor-pointer shadow-lg shadow-indigo-600/30"
+                >
+                  Upgrade Now ($49/mo)
+                </button>
+              )}
+            </div>
+
+          </div>
+        </div>
+
+        {/* Payment Gateway Modal (JazzCash / EasyPaisa / PayPal) */}
+        {showPayModal && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-2xl space-y-6">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white">Select Payment Gateway</h3>
+                  <p className="text-xs text-slate-400">Enterprise Plan - $49 / month</p>
+                </div>
+                <button onClick={() => setShowPayModal(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
+              </div>
+
+              {/* Gateway Selectors */}
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('jazzcash')}
+                  className={`p-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer flex flex-col items-center gap-1 ${selectedMethod === 'jazzcash' ? 'bg-red-600/20 border-red-500 text-red-400 shadow-md' : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'}`}
+                >
+                  <span>🔴 JazzCash</span>
+                  <span className="text-[10px] font-normal text-slate-500">PKR (Rs. 13,800)</span>
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('easypaisa')}
+                  className={`p-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer flex flex-col items-center gap-1 ${selectedMethod === 'easypaisa' ? 'bg-emerald-600/20 border-emerald-500 text-emerald-400 shadow-md' : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'}`}
+                >
+                  <span>🟢 EasyPaisa</span>
+                  <span className="text-[10px] font-normal text-slate-500">PKR (Rs. 13,800)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('paypal')}
+                  className={`p-3 rounded-xl border text-center font-bold text-xs transition cursor-pointer flex flex-col items-center gap-1 ${selectedMethod === 'paypal' ? 'bg-blue-600/20 border-blue-500 text-blue-400 shadow-md' : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'}`}
+                >
+                  <span>🔵 PayPal</span>
+                  <span className="text-[10px] font-normal text-slate-500">USD ($49.00)</span>
+                </button>
+              </div>
+
+              <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Selected Method:</span>
+                    <span className="text-white font-bold uppercase">{selectedMethod}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Total Amount:</span>
+                    <span className="text-white font-bold">
+                      {selectedMethod === 'paypal' ? '$49.00 USD' : 'Rs. 13,800 PKR'}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-1">
+                    {selectedMethod === 'paypal' ? 'PayPal Account Email' : `${selectedMethod.toUpperCase()} Mobile Number`}
+                  </label>
+                  <input
+                    type={selectedMethod === 'paypal' ? 'email' : 'text'}
+                    required
+                    value={accountNumber}
+                    onChange={(e) => setAccountNumber(e.target.value)}
+                    placeholder={selectedMethod === 'paypal' ? 'name@example.com' : '03XX-XXXXXXX'}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 text-sm font-mono"
+                  />
+                </div>
+
+                <div className="pt-2 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowPayModal(false)}
+                    className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition cursor-pointer border border-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition cursor-pointer shadow-lg shadow-indigo-600/30 disabled:opacity-50"
+                  >
+                    {loading ? 'Processing...' : `Confirm Payment`}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Active Plan Details Modal */}
+        {showActiveModal && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-6">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+                <h3 className="text-lg font-bold text-white">Subscription Details</h3>
+                <button onClick={() => setShowActiveModal(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
+              </div>
+
+              <div className="space-y-4 text-sm text-slate-300">
+                <div className="flex justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <span className="text-slate-400">Active Tier:</span>
+                  <span className="font-bold text-indigo-400">{currentPlan} Plan</span>
+                </div>
+                <div className="flex justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="font-bold text-emerald-400">Active & Healthy</span>
+                </div>
+                <div className="flex justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <span className="text-slate-400">Billing Cycle:</span>
+                  <span>Monthly Auto-Renewal</span>
+                </div>
+                <div className="flex justify-between bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <span className="text-slate-400">Node Limit:</span>
+                  <span className="font-mono">{currentPlan === 'Enterprise' ? 'Unlimited' : '5 Nodes Max'}</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  onClick={() => {
+                    alert('Invoice downloaded successfully.');
+                    setShowActiveModal(false);
+                  }}
+                  className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-medium transition cursor-pointer border border-slate-700"
+                >
+                  Download Invoice
+                </button>
+                <button
+                  onClick={() => setShowActiveModal(false)}
+                  className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition cursor-pointer shadow-lg shadow-indigo-600/30"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </main>
+    </div>
+  );
+}

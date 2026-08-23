@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/* Ensure proper scaling and box sizing across all devices */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+@theme {
+  --color-brand-bg: #030712;
+  --color-brand-card: #0b1329;
+  --color-brand-primary: #6366f1;
+  --color-brand-accent: #10b981;
+  --color-brand-text: #f3f4f6;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-brand-bg);
+    color: var(--color-brand-text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Custom Micro-animations for Premium SaaS Feel */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.glass-panel {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glow-overlay {
+  position: absolute;
+  pointer-events: none;
+  filter: blur(140px);
+  border-radius: 50%;
+  opacity: 0.15;
+  z-index: -1;
+}
+
+/* Light Theme Overrides */
+html.light-mode {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+html.light-mode body {
+  background-color: #f8fafc !important;
+  color: #1e293b !important;
+}
+
+html.light-mode .min-h-screen {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+}
+
+html.light-mode .card-container {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light-mode .title-text {
+  color: #0f172a !important;
+}
+
+html.light-mode .btn-back {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light-mode input {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
