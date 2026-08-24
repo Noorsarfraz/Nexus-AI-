@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import useDocumentTitle from '../utils/useDocumentTitle';
+import Sidebar from '../components/Sidebar';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -10,14 +11,13 @@ export default function BillingPage() {
   const [successMsg, setSuccessMsg] = useState('');
   const [showActiveModal, setShowActiveModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   // Payment Modal States
   const [showPayModal, setShowPayModal] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('jazzcash');
   const [accountNumber, setAccountNumber] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const location = useLocation();
 
   useEffect(() => {
     const savedPlan = localStorage.getItem('nexus_user_plan');
@@ -53,61 +53,21 @@ export default function BillingPage() {
     <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex">
       
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900/90 border-r border-slate-800 transition-all duration-300 flex flex-col justify-between p-4 sticky top-0 h-screen z-20 backdrop-blur-xl card-container`}>
-        <div className="space-y-8">
-          {/* Brand Logo */}
-          <div className="flex items-center justify-between px-2">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-600/30">
-                N
-              </div>
-              {sidebarOpen && <span className="text-xl font-black text-white title-text tracking-wide">NexusAI</span>}
-            </Link>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="space-y-1.5">
-            {[
-              { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-              { path: '/analytics', label: 'Analytics & Reports', icon: '📈' },
-              { path: '/models', label: 'AI Models Hub', icon: '🤖' },
-              { path: '/api-keys', label: 'API Keys & Tokens', icon: '🔑' },
-              { path: '/profile', label: 'Profile', icon: '👤' },
-              { path: '/settings', label: 'Settings', icon: '⚙️' },
-              { path: '/billing', label: 'Billing', icon: '💳' },
-            ].map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all ${
-                    isActive
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                      : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
-                  }`}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  {sidebarOpen && <span className="text-sm">{item.label}</span>}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Sidebar Footer / Toggle */}
-        <div className="space-y-3 pt-4 border-t border-slate-800/60">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-full py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white text-xs rounded-xl transition cursor-pointer border border-slate-700/50"
-          >
-            {sidebarOpen ? '◀ Collapse' : '▶'}
-          </button>
-        </div>
-      </aside>
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+      />
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 md:p-10 relative overflow-y-auto">
+      <main className="flex-1 w-full min-w-0 p-6 md:p-10 relative overflow-y-auto">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer"
+        >
+          ☰ <span className="text-sm">Menu</span>
+        </button>
         <div className="max-w-4xl mx-auto space-y-8">
           
           {/* Top Header */}

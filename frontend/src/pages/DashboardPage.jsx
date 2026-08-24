@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useNexusStore } from '../store/nexusStore';
 import { SkeletonLoader } from '../components/SkeletonLoader';
 import { EmptyState } from '../components/EmptyState';
 import FileUpload from '../components/FileUpload';
+import Sidebar from '../components/Sidebar';
 import useDocumentTitle from '../utils/useDocumentTitle';
 
 export default function DashboardPage() {
@@ -14,9 +15,9 @@ export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState('');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { nodes, isLoading, fetchNodes, createNode, deleteNode, updateNode, logoutUser } = useNexusStore();
 
@@ -40,72 +41,28 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex">
+    <div className="min-h-screen bg-[#030712] text-slate-200 flex relative overflow-x-hidden">
       
       {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-900/90 border-r border-slate-800 transition-all duration-300 flex flex-col justify-between p-4 sticky top-0 h-screen z-20 backdrop-blur-xl card-container`}>
-        <div className="space-y-8">
-          <div className="flex items-center justify-between px-2">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-600/30">
-                N
-              </div>
-              {sidebarOpen && <span className="text-xl font-black text-white title-text tracking-wide">NexusAI</span>}
-            </Link>
-          </div>
-
-          <nav className="space-y-1.5">
-            {[
-              { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-              { path: '/analytics', label: 'Analytics & Reports', icon: '📈' },
-              { path: '/models', label: 'AI Models Hub', icon: '🤖' },
-              { path: '/api-keys', label: 'API Keys & Tokens', icon: '🔑' },
-              { path: '/profile', label: 'Profile', icon: '👤' },
-              { path: '/settings', label: 'Settings', icon: '⚙️' },
-              { path: '/billing', label: 'Billing', icon: '💳' },
-            ].map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all ${
-                    isActive
-                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                      : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
-                  }`}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  {sidebarOpen && <span className="text-sm">{item.label}</span>}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div className="space-y-3 pt-4 border-t border-slate-800/60">
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-medium transition cursor-pointer"
-          >
-            <span className="text-lg">🚪</span>
-            {sidebarOpen && <span className="text-sm">Logout Session</span>}
-          </button>
-
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-full py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white text-xs rounded-xl transition cursor-pointer border border-slate-700/50"
-          >
-            {sidebarOpen ? '◀ Collapse' : '▶'}
-          </button>
-        </div>
-      </aside>
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        onLogoutClick={() => setShowLogoutModal(true)}
+      />
 
       {/* Main Content Area */}
-      <main className="flex-1 p-6 md:p-10 space-y-8 overflow-y-auto">
+      <main className="flex-1 w-full min-w-0 p-6 md:p-10 flex flex-col gap-8 overflow-y-auto relative">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer w-fit"
+        >
+          ☰ <span className="text-sm">Menu</span>
+        </button>
         
         {/* Top Welcome Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/60 border border-slate-800 p-6 rounded-2xl backdrop-blur-xl gap-4 shadow-xl card-container">
+        <div className="relative w-full flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-900/60 border border-slate-800 p-6 rounded-2xl backdrop-blur-xl gap-4 shadow-xl">
           <div>
             <h1 className="text-2xl font-black text-white title-text">
               Welcome back, <span className="text-indigo-400">{userEmail}</span> 👋
@@ -117,14 +74,14 @@ export default function DashboardPage() {
           
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-medium rounded-xl shadow-lg shadow-red-900/30 transition-all cursor-pointer border border-red-500/30 text-sm"
+            className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-medium rounded-xl shadow-lg shadow-red-900/30 transition-all cursor-pointer border border-red-500/30 text-sm shrink-0"
           >
             Logout Session
           </button>
         </div>
 
         {/* AI Server Nodes Monitor Section */}
-        <div className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-2xl space-y-6 card-container">
+        <div className="relative w-full bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6 md:p-8 backdrop-blur-xl shadow-2xl space-y-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800/60 pb-4">
             <div>
               <h2 className="text-xl font-bold text-white title-text">Live AI Server Nodes Monitor</h2>
@@ -205,8 +162,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Secure File & Config Upload Component - Full Width Clean Integration */}
-        <div className="w-full">
+        {/* Secure File & Config Upload Component */}
+        <div className="relative w-full">
           <FileUpload />
         </div>
       </main>
@@ -214,7 +171,7 @@ export default function DashboardPage() {
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center space-y-6 card-container">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center space-y-6">
             <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto text-red-500 text-xl font-bold shadow-inner">
               !
             </div>
@@ -222,7 +179,7 @@ export default function DashboardPage() {
               <h3 className="text-lg font-bold text-white title-text">End Secure Session?</h3>
               <p className="text-sm text-slate-400 mt-1">Are you sure you want to terminate this active authentication session?</p>
             </div>
-           <div className="flex gap-3">
+            <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}
                 className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition cursor-pointer border border-slate-700"
