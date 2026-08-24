@@ -34,7 +34,6 @@ beforeAll(async () => {
   });
   process.env.MONGO_URI = mongoServer.getUri();
   process.env.JWT_SECRET = 'test_jwt_secret';
-  process.env.ADMIN_EMAIL = 'admin@nexus.ai';
 
   // Required only after MONGO_URI is set, so connectDB() targets the
   // in-memory instance instead of any real database.
@@ -237,41 +236,5 @@ describe('GET /api/user/plan', () => {
 
     expect(res.status).toBe(403);
     expect(res.body.error).toMatch(/invalid or expired token/i);
-  });
-});
-
-
-describe('Role-based permissions', () => {
-  it('assigns the admin role to the configured admin email', async () => {
-    const res = await request(app)
-      .post('/api/signup')
-      .send({ email: 'admin@nexus.ai', password: 'Password123!' });
-
-    expect(res.status).toBe(201);
-
-    const login = await request(app)
-      .post('/api/login')
-      .send({ email: 'admin@nexus.ai', password: 'Password123!' });
-
-    expect(login.status).toBe(200);
-    expect(login.body.role).toBe('admin');
-
-    const users = await request(app)
-      .get('/api/admin/users')
-      .set('Authorization', `Bearer ${login.body.token}`);
-
-    expect(users.status).toBe(200);
-    expect(users.body.some((user) => user.email === 'admin@nexus.ai')).toBe(true);
-  });
-
-  it('blocks a normal user from admin routes', async () => {
-    const token = await signupAndLogin('normal-user@nexus.ai');
-
-    const res = await request(app)
-      .get('/api/admin/users')
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.status).toBe(403);
-    expect(res.body.error).toMatch(/forbidden/i);
   });
 });

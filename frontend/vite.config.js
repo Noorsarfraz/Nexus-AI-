@@ -4,9 +4,6 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  build: {
-    sourcemap: true,
-  },
   test: {
     globals: true,
     environment: 'jsdom', // Ye line ensure karegi ke browser environment mock ho

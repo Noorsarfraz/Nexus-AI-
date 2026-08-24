@@ -27,17 +27,9 @@ connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
-  .split(',')
-  .map((value) => value.trim())
-  .filter(Boolean);
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error('CORS: Origin not allowed'));
-    },
+    origin: true,
     credentials: true
   })
 );
@@ -168,10 +160,7 @@ app.post('/api/signup', async (req, res) => {
     await User.create({
       email,
       password: hashedPassword,
-      plan: 'Developer',
-      role: process.env.ADMIN_EMAIL && email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()
-        ? 'admin'
-        : 'user'
+      plan: 'Developer'
     });
 
     res.status(201).json({
@@ -213,19 +202,8 @@ app.post('/api/login', async (req, res) => {
       });
     }
 
-    // Keep the configured administrator account in sync even if it was
-    // created before ADMIN_EMAIL was added to the environment.
-    if (
-      process.env.ADMIN_EMAIL &&
-      user.email === process.env.ADMIN_EMAIL.toLowerCase() &&
-      user.role !== 'admin'
-    ) {
-      user.role = 'admin';
-      await user.save();
-    }
-
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id, email: user.email },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -233,8 +211,7 @@ app.post('/api/login', async (req, res) => {
     res.json({
       message: 'Login successful',
       token,
-      plan: user.plan,
-      role: user.role
+      plan: user.plan
     });
   } catch (err) {
     console.error('LOGIN ERROR:', err);
@@ -277,19 +254,6 @@ const verifyToken = (req, res, next) => {
       error: 'Invalid or expired token.'
     });
   }
-};
-
-// =====================================================
-// ROLE-BASED AUTHORIZATION
-// =====================================================
-
-const requireRole = (...roles) => (req, res, next) => {
-  if (!req.user || !roles.includes(req.user.role)) {
-    return res.status(403).json({
-      error: 'Forbidden. You do not have permission to access this resource.'
-    });
-  }
-  next();
 };
 
 // =====================================================
@@ -411,35 +375,6 @@ app.post('/api/uploads', verifyToken, upload.single('file'), async (req, res) =>
     res.status(500).json({
       error: err.message || 'Server error during Cloudinary file upload.'
     });
-  }
-});
-
-// ---------------- UPDATE FILE METADATA ----------------
-
-app.put('/api/uploads/:id', verifyToken, async (req, res) => {
-  try {
-    const { originalName } = req.body;
-
-    if (!originalName || !originalName.trim()) {
-      return res.status(400).json({ error: 'File name is required.' });
-    }
-
-    const fileItem = await Upload.findOne({
-      _id: req.params.id,
-      userEmail: req.user.email
-    });
-
-    if (!fileItem) {
-      return res.status(404).json({ error: 'File not found or unauthorized.' });
-    }
-
-    fileItem.originalName = originalName.trim();
-    await fileItem.save();
-
-    res.json(fileItem);
-  } catch (err) {
-    console.error('UPDATE FILE ERROR:', err);
-    res.status(500).json({ error: 'Unable to update file metadata.' });
   }
 });
 
@@ -686,33 +621,6 @@ app.delete('/api/nodes/:id', verifyToken, async (req, res) => {
     res.status(500).json({
       error: 'Unable to delete AI node.'
     });
-  }
-});
-
-// =====================================================
-// ADMIN ROUTES
-// =====================================================
-
-app.get('/api/admin/users', verifyToken, requireRole('admin'), async (req, res) => {
-  try {
-    const users = await User.find().select('_id email plan role createdAt').sort({ createdAt: -1 });
-    res.json(users);
-  } catch (err) {
-    console.error('ADMIN USERS ERROR:', err);
-    res.status(500).json({ error: 'Unable to fetch users.' });
-  }
-});
-
-app.delete('/api/admin/nodes/:id', verifyToken, requireRole('admin'), async (req, res) => {
-  try {
-    const deleted = await Node.findByIdAndDelete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: 'AI Node not found.' });
-    }
-    res.json({ message: 'AI Node deleted by administrator.' });
-  } catch (err) {
-    console.error('ADMIN DELETE NODE ERROR:', err);
-    res.status(500).json({ error: 'Unable to delete AI node.' });
   }
 });
 

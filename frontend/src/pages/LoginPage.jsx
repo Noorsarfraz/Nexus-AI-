@@ -32,7 +32,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.error || 'Login failed');
 
       // Save token and email via Zustand store
-      loginUser(data.token, email, data.role || 'user');
+      loginUser(data.token, email);
       
       // Navigate to dashboard after saving
       navigate('/dashboard');

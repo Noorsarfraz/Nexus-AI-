@@ -16,10 +16,9 @@ const getAuthHeaders = () => {
 export const useNexusStore = create((set, get) => ({
   // --- AUTH STATE & ACTIONS ---
   token: safeSessionStorage.getItem('token') || safeLocalStorage.getItem('token') || null,
-  userRole: safeSessionStorage.getItem('userRole') || safeLocalStorage.getItem('userRole') || 'user',
   isAuthenticated: !!(safeSessionStorage.getItem('token') || safeLocalStorage.getItem('token')),
 
-  loginUser: (token, email, role = 'user') => {
+  loginUser: (token, email) => {
     try {
       if (token) {
         safeSessionStorage.setItem('token', token);
@@ -27,9 +26,9 @@ export const useNexusStore = create((set, get) => ({
       }
       if (email) {
         safeSessionStorage.setItem('userEmail', email);
+        console.log("Email successfully saved to sessionStorage:", email);
       }
-      safeSessionStorage.setItem('userRole', role);
-      set({ token, userRole: role, isAuthenticated: true });
+      set({ token, isAuthenticated: true });
     } catch (err) {
       console.error("Error saving to sessionStorage:", err);
     }
@@ -38,10 +37,8 @@ export const useNexusStore = create((set, get) => ({
   logoutUser: () => {
     safeSessionStorage.removeItem('token');
     safeSessionStorage.removeItem('userEmail');
-    safeSessionStorage.removeItem('userRole');
     safeLocalStorage.removeItem('token');
-    safeLocalStorage.removeItem('userRole');
-    set({ token: null, userRole: 'user', isAuthenticated: false });
+    set({ token: null, isAuthenticated: false });
   },
 
   // --- NODES STATE & ACTIONS ---

@@ -1,31 +1,30 @@
-import React, { lazy, Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useNexusStore } from './store/nexusStore';
 
-const Navbar = lazy(() => import('./components/Navbar'));
-const Hero = lazy(() => import('./components/Hero'));
-const Features = lazy(() => import('./components/Features'));
-const About = lazy(() => import('./components/About'));
-const Pricing = lazy(() => import('./components/Pricing'));
-const Contact = lazy(() => import('./components/Contact'));
-const Footer = lazy(() => import('./components/Footer'));
-
-const CoreAppPreview = lazy(() => import('./components/CoreAppPreview'));
-const LiveNetworkMonitor = lazy(() => import('./components/LiveNetworkMonitor'));
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Features from './components/Features';
+import About from './components/About';
+import Pricing from './components/Pricing';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import AIServerMonitor from './components/AIServerMonitor';
+import CoreAppPreview from './components/CoreAppPreview';
+import LiveNetworkMonitor from './components/LiveNetworkMonitor';
 
 // Import Pages
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const SignupPage = lazy(() => import('./pages/SignupPage'));
-const DashboardPage = lazy(() => import('./pages/DashboardPage'));
-const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const BillingPage = lazy(() => import('./pages/BillingPage'));
-const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
-const ModelsPage = lazy(() => import('./pages/ModelsPage'));
-const ApiKeysPage = lazy(() => import('./pages/ApiKeysPage'));
-const DeployNodeForm = lazy(() => import('./components/DeployNodeForm'));
-const FileUpload = lazy(() => import('./components/FileUpload'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import DashboardPage from './pages/DashboardPage';
+import ProfilePage from './pages/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
+import BillingPage from './pages/BillingPage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import ModelsPage from './pages/ModelsPage';
+import ApiKeysPage from './pages/ApiKeysPage';
+import DeployNodeForm from './components/DeployNodeForm';
+import FileUpload from './components/FileUpload'; // Agar file root directory mein hai
 export default function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -33,7 +32,6 @@ export default function App() {
 
   // Store se direct authentication state utha li
   const isAuthenticated = useNexusStore((state) => state.isAuthenticated);
-  const userRole = useNexusStore((state) => state.userRole);
 
   const analyticsData = [
     { id: "rev", title: "Total Revenue API", value: "$84,259.00", trend: "↑ +14.2%", isPositive: true, subtext: "vs last month" },
@@ -49,7 +47,6 @@ export default function App() {
 
   return (
     <Router>
-      <Suspense fallback={<div className="min-h-screen bg-[#030712] text-slate-300 flex items-center justify-center">Loading…</div>}>
       <Routes>
         {/* Public Landing Page */}
         <Route path="/" element={
@@ -82,11 +79,6 @@ export default function App() {
         
         <Route path="/deploy-node" element={isAuthenticated ? <DeployNodeForm /> : <Navigate to="/login" />} />
         <Route path="/uploads" element={isAuthenticated ? <FileUpload /> : <Navigate to="/login" />} />
-        <Route path="/admin" element={
-          isAuthenticated && userRole === 'admin'
-            ? <AdminPage />
-            : <Navigate to="/dashboard" />
-        } />
         {/* Other Pages */}
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/models" element={<ModelsPage />} />
@@ -95,7 +87,6 @@ export default function App() {
         {/* Catch-all Redirect */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      </Suspense>
     </Router>
   );
 }
