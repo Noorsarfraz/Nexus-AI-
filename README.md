@@ -62,7 +62,7 @@ npm run dev              # http://localhost:5173
 
 ## Automated Testing
 
-The project includes a comprehensive automated testing suite covering the **backend API, frontend components, and end-to-end user flows**.
+The project includes automated tests covering the **backend API, frontend components, role-based authorization, and end-to-end user flows**.
 
 | Layer                | Testing Tools                                                                 | Test Location                          |
 | -------------------- | ----------------------------------------------------------------------------- | -------------------------------------- |
@@ -73,7 +73,7 @@ The project includes a comprehensive automated testing suite covering the **back
 
 ### Backend API Tests
 
-The backend test suite contains **10 automated tests** covering the project's core API functionality.
+The backend test suite contains **15 automated tests** covering the project's core API functionality.
 
 Test coverage includes:
 
@@ -134,7 +134,7 @@ The suite covers:
   * Required configuration file
   * Clearing validation errors after correcting input
 
-The frontend currently contains **11 tests** covering these scenarios.
+The frontend currently contains **13 tests** covering these scenarios.
 
 #### Run Frontend Tests
 
@@ -228,12 +228,28 @@ cd frontend
 npm run test:e2e
 ```
 
+## Case Study
+
+### Problem
+Nexus-AI provides a single workspace for users to deploy and monitor AI/server nodes, manage uploaded configuration files, and review operational analytics instead of keeping these workflows in disconnected tools.
+
+### Technology choices
+- **React + Vite + Tailwind CSS** for a fast, responsive dashboard experience.
+- **Express + Node.js** for a lightweight REST API and authentication middleware.
+- **MongoDB + Mongoose** for persistent user, node, and upload records.
+- **JWT + bcrypt** for stateless authentication with protected API routes.
+- **Cloudinary** for production file storage.
+- **Vercel + Railway** for simple independent frontend/backend deployments.
+
+### Challenge and solution
+A key challenge was keeping user data isolated while moving from temporary application state to persistent storage. The solution was to model users, nodes, and uploads in MongoDB and attach each resource to the authenticated user's ID/email. Protected queries then filter by the authenticated user, while admin-only endpoints use a separate role authorization middleware.
+
 ### Testing Requirements
 
 The automated testing implementation satisfies the following requirements:
 
-* [x] **5+ frontend tests** covering component rendering, user interactions, and form validation
-* [x] **5+ backend tests** covering core API endpoints and both successful and failure scenarios
+* [x] **13 frontend tests** covering component rendering, user interactions, and form validation
+* [x] **15 backend tests** covering core API endpoints and both successful and failure scenarios
 * [x] **End-to-end user flow** covering login, node creation/deployment, and dashboard verification
 * [x] **Simulated E2E testing** suitable for automated/CI environments
 * [x] **Real-browser E2E testing** using Cypress

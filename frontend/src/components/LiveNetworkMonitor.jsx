@@ -2,13 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 export default function LiveNetworkMonitor() {
   const [ipData, setIpData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [copiedKey, setCopiedKey] = useState(null);
   const [latency, setLatency] = useState(0);
   const [activeTab, setActiveTab] = useState('all');
   const [screenRes, setScreenRes] = useState('1920 x 1080');
+  const [hasRunDiagnostics, setHasRunDiagnostics] = useState(false);
 
   // Screen resolution safely handle in browser environment
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function LiveNetworkMonitor() {
 
   // Fetch Network Diagnostics using useCallback to fix dependency array
   const fetchDiagnostics = useCallback(() => {
+    setHasRunDiagnostics(true);
     setLoading(true);
     setError(null);
     const startTime = Date.now();
@@ -39,9 +41,9 @@ export default function LiveNetworkMonitor() {
       });
   }, []);
 
-  useEffect(() => {
-    fetchDiagnostics();
-  }, [fetchDiagnostics]);
+  // Do not call the third-party IP service during initial page load.
+  // Lighthouse and users get a faster first render; diagnostics run on demand.
+
 
   // Helper: Client Browser & OS Detector
   const getBrowserInfo = () => {
