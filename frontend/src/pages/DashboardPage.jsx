@@ -41,7 +41,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-200 flex relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#030712] text-slate-200 flex relative">
       
       {/* Sidebar */}
       <Sidebar
@@ -52,8 +52,8 @@ export default function DashboardPage() {
         onLogoutClick={() => setShowLogoutModal(true)}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full min-w-0 p-6 md:p-10 flex flex-col gap-8 overflow-y-auto relative">
+      {/* Main Content Area - Center scroller removed and margin adjusted */}
+      <main className={`flex-1 w-full min-w-0 p-6 md:p-10 flex flex-col gap-8 relative transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
         <button
           onClick={() => setMobileOpen(true)}
           className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer w-fit"

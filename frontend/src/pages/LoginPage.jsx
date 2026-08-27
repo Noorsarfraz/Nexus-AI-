@@ -31,8 +31,8 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Login failed');
 
-      // Save token and email via Zustand store
-      loginUser(data.token, email);
+      // Save token, email and role via Zustand store
+      loginUser(data.token, email, data.role);
       
       // Navigate to dashboard after saving
       navigate('/dashboard');

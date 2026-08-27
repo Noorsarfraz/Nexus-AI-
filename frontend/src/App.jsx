@@ -25,6 +25,8 @@ import ModelsPage from './pages/ModelsPage';
 import ApiKeysPage from './pages/ApiKeysPage';
 import DeployNodeForm from './components/DeployNodeForm';
 import FileUpload from './components/FileUpload'; // Agar file root directory mein hai
+import AdminDashboardPage from './pages/AdminDashboardPage';
+
 export default function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
@@ -32,6 +34,21 @@ export default function App() {
 
   // Store se direct authentication state utha li
   const isAuthenticated = useNexusStore((state) => state.isAuthenticated);
+  const role = useNexusStore((state) => state.role);
+  const theme = useNexusStore((state) => state.theme);
+  const subscribeToNodeEvents = useNexusStore((state) => state.subscribeToNodeEvents);
+
+  // Apply the persisted theme to <html> as soon as the app mounts, and
+  // whenever it changes (toggled from the Sidebar).
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', theme === 'light');
+  }, [theme]);
+
+  // Real-time node events (created/updated/deleted) — one subscription
+  // for the whole app, regardless of which authenticated page is open.
+  useEffect(() => {
+    subscribeToNodeEvents();
+  }, [subscribeToNodeEvents]);
 
   const analyticsData = [
     { id: "rev", title: "Total Revenue API", value: "$84,259.00", trend: "↑ +14.2%", isPositive: true, subtext: "vs last month" },
@@ -79,11 +96,29 @@ export default function App() {
         
         <Route path="/deploy-node" element={isAuthenticated ? <DeployNodeForm /> : <Navigate to="/login" />} />
         <Route path="/uploads" element={isAuthenticated ? <FileUpload /> : <Navigate to="/login" />} />
-        {/* Other Pages */}
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/models" element={<ModelsPage />} />
-        <Route path="/api-keys" element={<ApiKeysPage />} />
-        
+        {/* These were previously ungated — anyone could view them without
+            logging in even though they live in the authenticated sidebar.
+            Now consistent with every other dashboard page. */}
+        <Route path="/analytics" element={isAuthenticated ? <AnalyticsPage /> : <Navigate to="/login" />} />
+        <Route path="/models" element={isAuthenticated ? <ModelsPage /> : <Navigate to="/login" />} />
+        <Route path="/api-keys" element={isAuthenticated ? <ApiKeysPage /> : <Navigate to="/login" />} />
+
+        {/* Admin-only: requires auth AND role === 'admin'. A logged-in
+            non-admin is bounced to their dashboard rather than /login,
+            since they *are* authenticated — they just lack permission. */}
+        <Route
+          path="/admin"
+          element={
+            !isAuthenticated ? (
+              <Navigate to="/login" />
+            ) : role === 'admin' ? (
+              <AdminDashboardPage />
+            ) : (
+              <Navigate to="/dashboard" />
+            )
+          }
+        />
+
         {/* Catch-all Redirect */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

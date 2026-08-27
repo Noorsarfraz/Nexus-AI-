@@ -224,7 +224,7 @@ export default function AnalyticsPage() {
   }, [filteredUploads]);
 
   return (
-    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex">
+    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex relative">
       {/* Sidebar */}
       <Sidebar
         sidebarOpen={sidebarOpen}
@@ -233,11 +233,11 @@ export default function AnalyticsPage() {
         setMobileOpen={setMobileOpen}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full min-w-0 p-6 md:p-10 space-y-8 overflow-y-auto">
+      {/* Main Content Area - Center scroller removed and dynamic sidebar margin added */}
+      <main className={`flex-1 w-full min-w-0 p-6 md:p-10 space-y-8 relative transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
         <button
           onClick={() => setMobileOpen(true)}
-          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer"
+          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer w-fit"
         >
           ☰ <span className="text-sm">Menu</span>
         </button>
@@ -258,7 +258,7 @@ export default function AnalyticsPage() {
               <p className="text-sm text-red-400 mb-5">{error}</p>
               <button
                 onClick={fetchAnalyticsData}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition cursor-pointer"
               >
                 Try Again
               </button>

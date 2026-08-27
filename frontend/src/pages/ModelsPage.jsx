@@ -27,7 +27,7 @@ export default function ModelsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex">
+    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex relative">
       
       {/* Sidebar */}
       <Sidebar
@@ -37,20 +37,21 @@ export default function ModelsPage() {
         setMobileOpen={setMobileOpen}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full min-w-0 p-6 md:p-10 space-y-8 overflow-y-auto">
+      {/* Main Content Area - Fixed double scrollbar & added dynamic sidebar margin */}
+      <main className={`flex-1 w-full min-w-0 p-6 md:p-10 space-y-8 relative transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
         <button
           onClick={() => setMobileOpen(true)}
-          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer"
+          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer w-fit"
         >
           ☰ <span className="text-sm">Menu</span>
         </button>
-        <div className="flex justify-between items-center bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
+
+        <div className="flex justify-between items-center bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl card-container">
           <div>
-            <h1 className="text-2xl font-bold text-white">AI Models Hub</h1>
-            <p className="text-sm text-slate-400">Switch between core LLM models and configure deployment weighting.</p>
+            <h1 className="text-2xl font-black text-white title-text">AI Models Hub</h1>
+            <p className="text-sm text-slate-400 mt-1">Switch between core LLM models and configure deployment weighting.</p>
           </div>
-          <Link to="/dashboard" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm rounded-xl transition border border-slate-700">
+          <Link to="/dashboard" className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm rounded-xl transition border border-slate-700 font-medium">
             ← Back to Dashboard
           </Link>
         </div>
@@ -64,9 +65,9 @@ export default function ModelsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* GPT-5 Neural Core */}
-          <div className={`bg-slate-900 p-6 rounded-2xl border space-y-4 shadow-xl transition ${activeModel === 'GPT-5 Neural Core' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
+          <div className={`bg-slate-900 p-6 rounded-2xl border space-y-4 shadow-xl transition card-container ${activeModel === 'GPT-5 Neural Core' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-white text-lg">GPT-5 Neural Core</h3>
+              <h3 className="font-bold text-white text-lg title-text">GPT-5 Neural Core</h3>
               <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeModel === 'GPT-5 Neural Core' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
                 {activeModel === 'GPT-5 Neural Core' ? 'ACTIVE' : 'STANDBY'}
               </span>
@@ -91,9 +92,9 @@ export default function ModelsPage() {
           </div>
 
           {/* Claude 4 Ultra */}
-          <div className={`bg-slate-900 p-6 rounded-2xl border space-y-4 shadow-xl transition ${activeModel === 'Claude 4 Ultra' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
+          <div className={`bg-slate-900 p-6 rounded-2xl border space-y-4 shadow-xl transition card-container ${activeModel === 'Claude 4 Ultra' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-white text-lg">Claude 4 Ultra</h3>
+              <h3 className="font-bold text-white text-lg title-text">Claude 4 Ultra</h3>
               <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeModel === 'Claude 4 Ultra' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}>
                 {activeModel === 'Claude 4 Ultra' ? 'ACTIVE' : 'STANDBY'}
               </span>

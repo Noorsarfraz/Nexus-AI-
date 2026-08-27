@@ -50,7 +50,7 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex">
+    <div className="min-h-screen bg-[#030712] dark-transition text-slate-200 flex relative">
       
       {/* Sidebar */}
       <Sidebar
@@ -60,25 +60,25 @@ export default function BillingPage() {
         setMobileOpen={setMobileOpen}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full min-w-0 p-6 md:p-10 relative overflow-y-auto">
+      {/* Main Content Area - Fixed double scrollbar & added dynamic sidebar margin */}
+      <main className={`flex-1 w-full min-w-0 p-6 md:p-10 relative transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
         <button
           onClick={() => setMobileOpen(true)}
-          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer"
+          className="md:hidden mb-2 flex items-center gap-2 text-slate-300 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl cursor-pointer w-fit"
         >
           ☰ <span className="text-sm">Menu</span>
         </button>
         <div className="max-w-4xl mx-auto space-y-8">
           
           {/* Top Header */}
-          <div className="flex justify-between items-center bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl">
+          <div className="flex justify-between items-center bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl card-container">
             <div>
-              <h1 className="text-2xl font-bold text-white">Billing & Subscriptions</h1>
-              <p className="text-sm text-slate-400">Manage your active tier, regional payments, and server resource allocation.</p>
+              <h1 className="text-2xl font-black text-white title-text">Billing & Subscriptions</h1>
+              <p className="text-sm text-slate-400 mt-1">Manage your active tier, regional payments, and server resource allocation.</p>
             </div>
             <Link 
               to="/dashboard" 
-              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm rounded-xl transition border border-slate-700"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm rounded-xl transition border border-slate-700 font-medium"
             >
               <span>←</span> Back to Dashboard
             </Link>
@@ -94,13 +94,13 @@ export default function BillingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Developer Tier */}
-            <div className={`bg-slate-900 p-8 rounded-2xl space-y-4 relative shadow-xl transition border ${currentPlan === 'Developer' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
+            <div className={`bg-slate-900 p-8 rounded-2xl space-y-4 relative shadow-xl transition card-container border ${currentPlan === 'Developer' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
               {currentPlan === 'Developer' && (
                 <span className="absolute top-6 right-6 px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded-full font-mono">
                   CURRENT PLAN
                 </span>
               )}
-              <h2 className="text-xl font-bold text-white">Developer Tier</h2>
+              <h2 className="text-xl font-bold text-white title-text">Developer Tier</h2>
               <p className="text-3xl font-black text-white">$0 <span className="text-xs font-normal text-slate-400">/ month</span></p>
               <p className="text-sm text-slate-400">Includes standard API endpoints, up to 5 live server nodes, and basic JWT security.</p>
               
@@ -122,13 +122,13 @@ export default function BillingPage() {
             </div>
 
             {/* Enterprise Tier */}
-            <div className={`bg-slate-900 p-8 rounded-2xl space-y-4 relative shadow-xl transition border ${currentPlan === 'Enterprise' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
+            <div className={`bg-slate-900 p-8 rounded-2xl space-y-4 relative shadow-xl transition card-container border ${currentPlan === 'Enterprise' ? 'border-indigo-500/80' : 'border-slate-800'}`}>
               {currentPlan === 'Enterprise' && (
                 <span className="absolute top-6 right-6 px-3 py-1 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded-full font-mono">
                   CURRENT PLAN
                 </span>
               )}
-              <h2 className="text-xl font-bold text-white">Enterprise Tier</h2>
+              <h2 className="text-xl font-bold text-white title-text">Enterprise Tier</h2>
               <p className="text-3xl font-black text-white">$49 <span className="text-xs font-normal text-slate-400">/ month</span></p>
               <p className="text-sm text-slate-400">Unlimited AI cluster nodes, dedicated telemetry streams, and priority support.</p>
               
@@ -159,9 +159,9 @@ export default function BillingPage() {
               <div className="flex justify-between items-center border-b border-slate-800 pb-4">
                 <div>
                   <h3 className="text-lg font-bold text-white">Select Payment Gateway</h3>
-                  <p className="text-xs text-slate-400">Enterprise Plan - $49 / month</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Enterprise Plan - $49 / month</p>
                 </div>
-                <button onClick={() => setShowPayModal(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
+                <button onClick={() => setShowPayModal(false)} className="text-slate-400 hover:text-white text-lg cursor-pointer">✕</button>
               </div>
 
               {/* Gateway Selectors */}
@@ -249,7 +249,7 @@ export default function BillingPage() {
             <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-6">
               <div className="flex justify-between items-center border-b border-slate-800 pb-4">
                 <h3 className="text-lg font-bold text-white">Subscription Details</h3>
-                <button onClick={() => setShowActiveModal(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
+                <button onClick={() => setShowActiveModal(false)} className="text-slate-400 hover:text-white text-lg cursor-pointer">✕</button>
               </div>
 
               <div className="space-y-4 text-sm text-slate-300">

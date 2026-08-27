@@ -18,6 +18,72 @@ html, body {
   --color-brand-text: #f3f4f6;
 }
 
+/* =====================================================
+   LIGHT MODE OVERRIDE LAYER
+   -----------------------------------------------------
+   The app is designed dark-first (every component uses literal
+   slate-900/#030712-style Tailwind classes rather than semantic
+   tokens). Rather than rewrite every component, toggling the `light`
+   class on <html> (see store/nexusStore.js -> toggleTheme) flips the
+   small set of color utilities that are actually reused across pages,
+   so the whole authenticated app switches palette consistently.
+   ===================================================== */
+
+html.light body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+html.light .bg-\[\#030712\],
+html.light .bg-slate-950,
+html.light .bg-slate-950\/40,
+html.light .bg-slate-950\/80 {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .bg-slate-900,
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900\/95 {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-slate-800,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/80 {
+  background-color: #e2e8f0 !important;
+}
+
+html.light .border-slate-800,
+html.light .border-slate-800\/60,
+html.light .border-slate-700,
+html.light .border-slate-700\/50 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html.light .text-slate-400,
+html.light .text-slate-500,
+html.light .text-slate-600 {
+  color: #475569 !important;
+}
+
+html.light .hover\:text-white:hover {
+  color: #0f172a !important;
+}
+
+html.light .hover\:bg-slate-800:hover,
+html.light .hover\:bg-slate-700:hover,
+html.light .hover\:bg-slate-800\/60:hover {
+  background-color: #e2e8f0 !important;
+}
+
 @layer base {
   body {
     background-color: var(--color-brand-bg);

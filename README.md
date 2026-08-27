@@ -1,100 +1,222 @@
-## Nexus-AI
+# ⚡ Nexus AI
 
-AI neural-node deployment and monitoring platform: users sign up, deploy/manage "AI nodes" from a per-user dashboard, upload files, and view live telemetry.
+> **AI infrastructure deployment & monitoring platform** — deploy, manage, monitor, and administer AI nodes from a secure, real-time dashboard.
 
-### Live URLs
 
-> Fill these in once deployed.
+### 🚀 Live Demo
 
-* **Frontend:** `<your frontend URL, e.g. https://nexus-ai.vercel.app>`
-* **Backend API:** `<your backend URL, e.g. https://nexusaibackend-production.up.railway.app>`
+- **Frontend:** https://nexus-ai-virid-eta.vercel.app
+- **Backend API:** https://nexus-ai-production-72d2.up.railway.app/api
+- **Repository:** https://github.com/Noorsarfraz/Nexus-AI-
 
-### Architecture Overview
+---
 
+## ✨ What is Nexus AI?
+
+Nexus AI brings AI node deployment, configuration files, ownership, monitoring, and administration into one focused platform.
+
+### Core capabilities
+
+- 🔐 **Authentication** — JWT + bcrypt with protected routes
+- 🖥️ **Node Management** — full create, read, update, delete workflow
+- 📁 **File Uploads** — configuration/reference files stored on Cloudinary
+- ⚡ **Real-Time Monitoring** — Socket.io events and live telemetry
+- 👑 **Role-Based Access** — `user` and `admin` permissions
+- 📊 **Analytics** — dashboard metrics and charts with Recharts
+- 🌓 **Dark / Light Mode** — persisted theme preference
+- 🛡️ **Validation & UX** — client/server validation, loading, error, empty and success states
+- 🧪 **Automated Testing** — backend, frontend, simulated E2E, and Cypress browser tests
+- 🐳 **Docker** — local multi-service environment
+- 🔄 **CI/CD** — GitHub Actions on pushes and pull requests
+
+---
+
+## 🧭 Application
+
+### Public
+
+`/` · `/login` · `/signup` · `/core-preview`
+
+### Authenticated
+
+`/dashboard` · `/deploy-node` · `/uploads` · `/analytics` · `/models` · `/api-keys` · `/billing` · `/profile` · `/settings`
+
+### Admin
+
+`/admin`
+
+Authenticated users are protected by route guards; authenticated non-admin users cannot access admin functionality.
+
+---
+
+## 🏗️ Architecture
+
+```text
+┌──────────────────────────┐
+│   React 19 + Vite        │
+│   Tailwind + Zustand     │
+│   React Router           │
+└────────────┬─────────────┘
+             │ HTTPS / REST / JWT
+             ▼
+┌──────────────────────────┐
+│   Node.js + Express 5    │
+│   REST API + Socket.io   │
+│   JWT / bcrypt / Multer  │
+└──────────┬───────┬───────┘
+           │       │
+       Mongoose  Cloudinary
+           │       │
+           ▼       ▼
+     ┌─────────┐ ┌───────────┐
+     │ MongoDB │ │ Cloudinary│
+     │ Atlas   │ │ Files     │
+     └─────────┘ └───────────┘
 ```
-┌─────────────────┐        HTTPS / REST         ┌──────────────────┐
-│   Frontend       │  ─────────────────────────▶ │   Backend         │
-│   React + Vite   │  ◀───────────────────────── │   Node.js/Express │
-│   (Vercel/       │        JSON + JWT            │   (Railway/       │
-│    Netlify)       │                              │    Render)        │
-└─────────────────┘                              └─────────┬────────┘
-                                                             │
-                                        ┌────────────────────┼────────────────────┐
-                                        ▼                                         ▼
-                                ┌───────────────┐                       ┌──────────────────┐
-                                │  MongoDB Atlas │                       │    Cloudinary      │
-                                │  (users, nodes,│                       │  (uploaded files/   │
-                                │   uploads)      │                       │   images)           │
-                                └───────────────┘                       └──────────────────┘
+
+The frontend communicates with the Express API through `VITE_API_URL`. MongoDB stores users, nodes, and upload metadata; Cloudinary stores binary files. Socket.io runs alongside the API and sends events to each user's private room.
+
+---
+
+## 🧰 Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Frontend | React 19, Vite | Modern SPA |
+| Styling | Tailwind CSS v4 | Responsive UI + theming |
+| State | Zustand | Lightweight client state |
+| Routing | React Router | Navigation + protected routes |
+| Backend | Node.js, Express 5 | REST API |
+| Database | MongoDB Atlas, Mongoose | Persistent application data |
+| Auth | JWT, bcrypt | Authentication + authorization |
+| Files | Multer, Cloudinary | Persistent uploads |
+| Real-time | Socket.io | Live node/telemetry updates |
+| Charts | Recharts | Analytics visualization |
+| Testing | Jest, Supertest, Vitest, RTL, Cypress | Unit/API/E2E coverage |
+| DevOps | Docker, GitHub Actions | Containers + CI |
+
+---
+
+## 🔐 Authentication & RBAC
+
+Nexus AI uses JWT authentication with bcrypt password hashing.
+
+**Signup**
+- Validates credentials.
+- Hashes passwords before storage.
+- Creates the account in MongoDB.
+- The first account on a fresh database becomes `admin`.
+- `ADMIN_EMAILS` can define additional admin accounts.
+- The client cannot self-promote by submitting a `role`.
+
+**Protected API**
+
+```text
+Authorization: Bearer <JWT>
 ```
 
-* **Frontend** — React 19 + Vite, Tailwind CSS v4, Zustand for state, React Router for client-side routing. Talks to the backend over `VITE_API_URL`.
-* **Backend** — Express 5 REST API. Handles auth (JWT + bcrypt), per-user AI node CRUD, and file uploads (Multer → Cloudinary storage).
-* **Database** — MongoDB (Atlas in production) via Mongoose.
-* **File storage** — Cloudinary (no local disk storage in production).
+**Admin API**
 
-### Deployment
-
-**Backend (Railway/Render/etc.):**
-1. Push this repo to GitHub.
-2. Create a new service pointing at the `backend/` folder, build command `npm install`, start command `npm start`.
-3. Set environment variables on the host (never commit real values): `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `PORT`.
-
-**Frontend (Vercel/Netlify):**
-1. Create a new project pointing at the `frontend/` folder, build command `npm run build`, output directory `dist`.
-2. Set environment variable `VITE_API_URL` to the deployed backend's `/api` URL.
-3. Add a SPA rewrite rule (all routes → `/index.html`) so React Router routes work on refresh/direct navigation.
-
-### Local Setup
-
-```bash
-# Backend
-cd backend
-cp .env.example .env   # fill in your own MongoDB/JWT/Cloudinary values
-npm install
-npm start               # http://localhost:5001
-
-# Frontend (new terminal)
-cd frontend
-npm install
-npm run dev              # http://localhost:5173
+```text
+verifyToken → requireAdmin
 ```
 
-## Automated Testing
+Admin operations include user management, platform statistics, and platform-wide node/upload management.
 
-The project includes a comprehensive automated testing suite covering the **backend API, frontend components, and end-to-end user flows**.
+---
 
-| Layer                | Testing Tools                                                                 | Test Location                          |
-| -------------------- | ----------------------------------------------------------------------------- | -------------------------------------- |
-| **Backend API**      | Jest, Supertest, MongoDB Memory Server                                        | `backend/tests/api.test.js`            |
-| **Frontend**         | Vitest, React Testing Library, Testing Library User Event                     | `frontend/src/**/__tests__/*.test.jsx` |
-| **Simulated E2E**    | Vitest, React Testing Library, mocked network, real Zustand store and routing | `frontend/src/test/e2e-flow.test.jsx`  |
-| **Real Browser E2E** | Cypress                                                                       | `frontend/cypress/e2e/user-flow.cy.js` |
+## 🔄 CRUD & API
 
-### Backend API Tests
+### AI Nodes
 
-The backend test suite contains **10 automated tests** covering the project's core API functionality.
+| Action | Endpoint |
+|---|---|
+| Create | `POST /api/nodes` |
+| Read | `GET /api/nodes` |
+| Update | `PUT /api/nodes/:id` |
+| Delete | `DELETE /api/nodes/:id` |
+| Deploy | `POST /api/nodes/deploy` |
 
-Test coverage includes:
+### Users
 
-* `POST /api/signup`
-* `POST /api/login`
-* `GET /api/user/plan`
-* `GET /api/nodes`
-* `POST /api/nodes`
-* `PUT /api/nodes/:id`
-* `DELETE /api/nodes/:id`
-* Missing required fields
-* Duplicate email registration
-* Incorrect login credentials
-* Missing or invalid authentication tokens
-* Attempting to delete a node more than once
+| Action | Endpoint |
+|---|---|
+| Create | `POST /api/signup` |
+| Read | `GET /api/admin/users` |
+| Update role | `PUT /api/admin/users/:id/role` |
+| Delete | `DELETE /api/admin/users/:id` |
 
-The tests use **MongoDB Memory Server** to create a temporary in-memory MongoDB database. This keeps test data isolated from the application's real `nexus_ai` database and eliminates the need for a manually configured test database.
+### Uploads
 
-> **Note:** Cloudinary-dependent routes such as `/api/uploads` and `/api/nodes/deploy` are currently excluded from the backend integration tests because they require external third-party services. These routes can be covered in a future iteration using mocked Cloudinary services.
+| Action | Endpoint |
+|---|---|
+| Create | `POST /api/uploads` |
+| Read | `GET /api/uploads` |
+| Delete | `DELETE /api/uploads/:id` |
 
-#### Run Backend Tests
+Nodes and uploads are associated with their owning user, while admin endpoints provide platform-level management.
+
+---
+
+## ⚡ Real-Time Features
+
+Socket.io provides:
+
+- `node:created`
+- `node:updated`
+- `node:deleted`
+- Live telemetry ticks
+
+Node changes are pushed to the user's private room, so open tabs/devices update without a manual refresh.
+
+---
+
+## 📁 File Upload Flow
+
+```text
+React Dropzone
+      ↓
+    Multer
+      ↓
+  Cloudinary
+      ↓
+MongoDB metadata
+```
+
+This avoids relying on ephemeral cloud-server storage and keeps upload metadata linked to the authenticated user.
+
+---
+
+## 🎨 UX & Validation
+
+- Responsive dashboard and landing experience
+- Dark/light theme persisted in `localStorage`
+- Client-side validation
+- Server-side validation
+- Loading/skeleton states
+- Error handling
+- Empty states
+- Success feedback
+- Protected-route redirects
+
+---
+
+## 🧪 Testing
+
+The project contains **28+ automated tests/spec cases**, exceeding the required 10-test minimum.
+
+| Layer | Tools | Coverage |
+|---|---|---|
+| Backend API | Jest, Supertest, MongoDB Memory Server | Auth, CRUD, validation, errors |
+| Frontend | Vitest, React Testing Library, User Event | Components, forms, interactions |
+| Simulated E2E | Vitest + RTL | Login → node creation → dashboard |
+| Browser E2E | Cypress | Signup → login → deploy → verify |
+
+### Backend
+
+`backend/tests/api.test.js`
+
+Covers signup, login, auth failures, user plan access, node CRUD, validation, duplicate registration, and error paths.
 
 ```bash
 cd backend
@@ -102,41 +224,7 @@ npm install
 npm test
 ```
 
-### Frontend Tests
-
-The frontend test suite uses **Vitest, React Testing Library, and Testing Library User Event** to verify component rendering, user interactions, and form validation.
-
-The suite covers:
-
-* `Button`
-
-  * Component rendering
-  * Variant styling
-  * Click interaction
-
-* `EmptyState`
-
-  * Heading and description rendering
-  * Action button interaction
-
-* `SignupPage`
-
-  * Email and password fields
-  * Successful signup flow
-  * Backend error handling
-
-* `DeployNodeForm`
-
-  * Required node name validation
-  * Minimum node name length
-  * Required deployment date
-  * Required access key
-  * Required configuration file
-  * Clearing validation errors after correcting input
-
-The frontend currently contains **11 tests** covering these scenarios.
-
-#### Run Frontend Tests
+### Frontend
 
 ```bash
 cd frontend
@@ -144,54 +232,52 @@ npm install
 npm test
 ```
 
-### End-to-End Testing
+### Cypress
 
-The project includes **two levels of end-to-end testing** to verify complete user workflows.
+```bash
+# Terminal 1
+cd backend && npm start
 
-#### 1. Simulated E2E Test
+# Terminal 2
+cd frontend && npm run dev
 
-The simulated E2E test runs as part of the regular Vitest test suite and does not require the backend or frontend development servers to be running.
-
-It uses:
-
-* Vitest
-* React Testing Library
-* Mocked network requests
-* Real Zustand store
-* Real application routing
-
-The test simulates the following user journey:
-
-**Login → Create an AI Node → Node Appears in Dashboard**
-
-Test file:
-
-```text
-frontend/src/test/e2e-flow.test.jsx
+# Terminal 3
+cd frontend && npm run test:e2e
 ```
 
-Because network requests are mocked, this test is fast and suitable for automated CI environments.
+For interactive Cypress:
 
-#### 2. Real Browser E2E Test
-
-The project also includes a **Cypress end-to-end test** that runs against the actual application in a real browser.
-
-The test verifies the complete workflow:
-
-**Signup → Login → Deploy a Node → Verify Node Appears**
-
-Test file:
-
-```text
-frontend/cypress/e2e/user-flow.cy.js
+```bash
+cd frontend
+npx cypress open
 ```
 
-#### Run Cypress Tests
+> Cloudinary-dependent upload/deployment integration paths are not included in backend integration tests because they require live third-party services; they can be added later with mocked Cloudinary calls.
 
-Start the backend:
+---
+
+## 🚀 Local Setup
+
+### Requirements
+
+- Node.js 20+
+- npm
+- MongoDB / MongoDB Atlas
+- Cloudinary account
+
+### 1. Clone
+
+```bash
+git clone https://github.com/Noorsarfraz/Nexus-AI-.git
+cd Nexus-AI-
+```
+
+### 2. Backend
 
 ```bash
 cd backend
+cp .env.example .env
+npm install
 npm start
 ```
 
@@ -201,10 +287,23 @@ Backend:
 http://localhost:5001
 ```
 
-Start the frontend in a second terminal:
+Set your own values in `backend/.env`:
+
+```env
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_long_random_secret
+PORT=5001
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+ADMIN_EMAILS=admin@example.com
+```
+
+### 3. Frontend
 
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
 
@@ -214,29 +313,169 @@ Frontend:
 http://localhost:5173
 ```
 
-Then open Cypress interactively:
+Create `frontend/.env`:
 
-```bash
-cd frontend
-npx cypress open
+```env
+VITE_API_URL=http://localhost:5001/api
 ```
 
-Or run the E2E tests in headless mode:
+---
 
-```bash
-cd frontend
-npm run test:e2e
+## ☁️ Deployment
+
+### Backend — Railway
+
+1. Deploy the `backend/` directory.
+2. Use `npm install` as the build command.
+3. Use `npm start` as the start command.
+4. Configure `MONGO_URI`, `JWT_SECRET`, Cloudinary variables, `PORT`, and optional `ADMIN_EMAILS`.
+
+**Live API:** https://nexus-ai-production-72d2.up.railway.app/api
+
+### Frontend — Vercel
+
+1. Deploy the `frontend/` directory.
+2. Build command: `npm run build`
+3. Output: `dist`
+4. Set:
+
+```env
+VITE_API_URL=https://nexus-ai-production-72d2.up.railway.app/api
 ```
 
-### Testing Requirements
+`frontend/vercel.json` provides the SPA rewrite required by React Router.
 
-The automated testing implementation satisfies the following requirements:
+**Live app:** https://nexus-ai-virid-eta.vercel.app
 
-* [x] **5+ frontend tests** covering component rendering, user interactions, and form validation
-* [x] **5+ backend tests** covering core API endpoints and both successful and failure scenarios
-* [x] **End-to-end user flow** covering login, node creation/deployment, and dashboard verification
-* [x] **Simulated E2E testing** suitable for automated/CI environments
-* [x] **Real-browser E2E testing** using Cypress
-* [x] **Documented test execution commands** for backend, frontend, and E2E testing
+---
 
-This testing structure provides coverage across the application's **UI, business logic, API layer, authentication, validation, database interactions, routing, and complete user workflows**.
+## 🐳 Docker
+
+The repository includes Dockerfiles for both services and a root `docker-compose.yml`.
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+```text
+Frontend → http://localhost:5173
+Backend  → http://localhost:5001
+MongoDB  → localhost:27017
+```
+
+MongoDB data is persisted through a named Docker volume.
+
+---
+
+## 🔄 CI/CD
+
+`.github/workflows/ci.yml` runs on every push and pull request to `main`.
+
+CI performs:
+
+1. Backend dependency installation
+2. Backend Jest tests
+3. Frontend dependency installation
+4. Frontend Vitest tests
+5. Frontend production build
+
+---
+
+## 📂 Project Structure
+
+```text
+Nexus-AI-/
+├── backend/
+│   ├── config/              # MongoDB + Cloudinary
+│   ├── models/              # User, Node, Upload
+│   ├── tests/               # Jest + Supertest
+│   ├── server.js            # Express + Socket.io
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   │   ├── pages/           # Application views
+│   │   ├── components/      # Reusable UI
+│   │   ├── store/           # Zustand state
+│   │   └── test/             # Simulated E2E
+│   ├── cypress/e2e/          # Browser E2E
+│   └── Dockerfile
+├── .github/workflows/ci.yml
+├── docker-compose.yml
+├── CASE_STUDY.md
+└── README.md
+```
+
+---
+
+## 📌 Case Study
+
+### Problem
+
+AI infrastructure experiments can become difficult to track: deployed nodes, ownership, configuration files, and live status often end up scattered across different tools.
+
+**Nexus AI** provides one focused dashboard for that workflow.
+
+### Why these technologies?
+
+- **React + Vite + Tailwind + Zustand** — fast, responsive UI with lightweight state management.
+- **Node + Express + MongoDB** — simple REST architecture suited to document-shaped users, nodes, and uploads.
+- **JWT + bcrypt** — stateless authentication for independently deployed frontend/backend services.
+- **Cloudinary** — persistent file storage that survives cloud redeployments.
+- **Socket.io** — room-based real-time updates with automatic reconnection.
+
+### Challenge
+
+As the dashboard grew, authentication behavior needed to remain consistent across many protected routes.
+
+The solution was an authorization audit and a guard pattern separating **authentication** from **authorization**: unauthenticated users are sent to login, while authenticated non-admin users attempting `/admin` are returned to their own dashboard.
+
+---
+
+## 🏆 Requirement Coverage
+
+| Requirement | Status |
+|---|---|
+| 4–5+ frontend views | ✅ |
+| CRUD on related resources | ✅ |
+| Real database persistence | ✅ |
+| Complete authentication | ✅ |
+| Protected routes | ✅ |
+| Role-based permissions | ✅ |
+| Client + server validation | ✅ |
+| Loading/error/empty states | ✅ |
+| Responsive UI | ✅ |
+| Live frontend + backend | ✅ |
+| Public GitHub repo | ✅ |
+| 10+ tests | ✅ |
+| Real-time features | ✅ |
+| File uploads | ✅ |
+| Dashboard charts | ✅ |
+| Dark mode | ✅ |
+| CI/CD | ✅ |
+| Docker | ✅ |
+| Case study | ✅ |
+
+---
+
+## 🔒 Security
+
+Never commit:
+
+```text
+backend/.env
+frontend/.env
+```
+
+Use `.env.example` templates and deployment-provider environment variables instead.
+
+If credentials were ever exposed publicly, rotate the affected MongoDB, JWT, Cloudinary, and other third-party credentials immediately.
+
+---
+
+## 📜 Acknowledgments & Context
+
+This project was developed as the final full-stack capstone project for the **Neurofive Solutions** internship program. 
+
+It serves as a comprehensive portfolio piece demonstrating end-to-end web development, API design, database management, automated testing, and live deployment.

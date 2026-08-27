@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { safeLocalStorage, safeSessionStorage } from '../utils/safeStorage';
+import { getSocket } from '../utils/socket';
 
 const API_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5001/api'
@@ -17,8 +18,9 @@ export const useNexusStore = create((set, get) => ({
   // --- AUTH STATE & ACTIONS ---
   token: safeSessionStorage.getItem('token') || safeLocalStorage.getItem('token') || null,
   isAuthenticated: !!(safeSessionStorage.getItem('token') || safeLocalStorage.getItem('token')),
+  role: safeSessionStorage.getItem('role') || safeLocalStorage.getItem('role') || 'user',
 
-  loginUser: (token, email) => {
+  loginUser: (token, email, role) => {
     try {
       if (token) {
         safeSessionStorage.setItem('token', token);
@@ -28,7 +30,16 @@ export const useNexusStore = create((set, get) => ({
         safeSessionStorage.setItem('userEmail', email);
         console.log("Email successfully saved to sessionStorage:", email);
       }
-      set({ token, isAuthenticated: true });
+      if (role) {
+        safeSessionStorage.setItem('role', role);
+      }
+      set({ token, isAuthenticated: true, role: role || 'user' });
+
+      // Join this user's private room so real-time node events (deploy/
+      // update/delete) are scoped to them instead of broadcast globally.
+      if (email) {
+        getSocket().emit('join', email);
+      }
     } catch (err) {
       console.error("Error saving to sessionStorage:", err);
     }
@@ -37,13 +48,56 @@ export const useNexusStore = create((set, get) => ({
   logoutUser: () => {
     safeSessionStorage.removeItem('token');
     safeSessionStorage.removeItem('userEmail');
+    safeSessionStorage.removeItem('role');
     safeLocalStorage.removeItem('token');
-    set({ token: null, isAuthenticated: false });
+    safeLocalStorage.removeItem('role');
+    set({ token: null, isAuthenticated: false, role: 'user' });
+  },
+
+  // --- THEME (light / dark) ---
+  theme: safeLocalStorage.getItem('theme') || 'dark',
+
+  toggleTheme: () => {
+    const next = get().theme === 'dark' ? 'light' : 'dark';
+    safeLocalStorage.setItem('theme', next);
+    set({ theme: next });
   },
 
   // --- NODES STATE & ACTIONS ---
   nodes: [],
   isLoading: false,
+
+  // Wires up the socket.io listeners once (e.g. from a top-level effect
+  // in App.jsx) so any node created/updated/deleted — from this tab,
+  // another tab, or another device logged into the same account — is
+  // reflected in the dashboard immediately without a manual refresh.
+  subscribeToNodeEvents: () => {
+    const socket = getSocket();
+
+    socket.off('node:created');
+    socket.off('node:updated');
+    socket.off('node:deleted');
+
+    socket.on('node:created', (node) => {
+      set((state) => (
+        state.nodes.some((n) => n._id === node._id)
+          ? state
+          : { nodes: [node, ...state.nodes] }
+      ));
+    });
+
+    socket.on('node:updated', (node) => {
+      set((state) => ({
+        nodes: state.nodes.map((n) => (n._id === node._id ? node : n))
+      }));
+    });
+
+    socket.on('node:deleted', ({ id }) => {
+      set((state) => ({
+        nodes: state.nodes.filter((n) => n._id !== id)
+      }));
+    });
+  },
 
   fetchNodes: async () => {
     set({ isLoading: true });
