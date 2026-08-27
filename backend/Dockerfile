@@ -2,9 +2,10 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install deps first so this layer is cached unless package*.json changes.
 COPY package*.json ./
-RUN npm ci --omit=dev
+
+# Conflicts ko bypass karne ke liye npm ci ki jagah ye command use karein:
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
